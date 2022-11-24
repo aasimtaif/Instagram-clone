@@ -8,6 +8,8 @@ import {
   // doc,
 } from "firebase/firestore";
 import Post from './components/Post'
+import BasicModal from './components/BasicModal'
+
 function App() {
 
   const [posts, setPosts] = useState([
@@ -42,6 +44,7 @@ function App() {
 console.log(posts)
   return (
     <div className="App">
+      <BasicModal/>
       <div className="app_header">
         <img className="app_headerImage" src="https://cdn.pixabay.com/photo/2016/08/15/01/29/instagram-1594387__480.png" alt='instagram poster' />
       </div>
