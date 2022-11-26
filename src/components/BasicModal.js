@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile,signOut } from "firebase/auth";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { Input } from '@mui/material';
@@ -21,7 +21,7 @@ const style = {
 
 export default function BasicModal() {
   const [userName, setUserName] = useState('');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
 
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -35,6 +35,9 @@ export default function BasicModal() {
     event.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
       .then((authUser) => {
+        console.log(authUser)
+        setUser(authUser)
+
         updateProfile(auth.currentUser, {
           displayName: userName
         })
@@ -47,14 +50,19 @@ export default function BasicModal() {
       });
   }
 
+  const signout = signOut(auth).then(() => {
+    // Sign-out successful.
+  }).catch((error) => {
+    // An error happened.
+  });
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         console.log(authUser)
-        setUser(authUser)
       } else {
-setUser(null )
+// setUser(null )
       }
     })
     return () => {
@@ -72,12 +80,13 @@ setUser(null )
   return (
     <div>
       {user ? (
-      <Button onClick={handleOpen}>Login</Button>
+      <Button onClick={handleOpen}>LogOut</Button>
 
       ) : (
         <Button onClick={handleOpen}>SignUp</Button>
 
       )}
+
 
       <Modal
         open={open}
