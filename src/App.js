@@ -4,8 +4,8 @@ import { db,auth } from './firebase'
 import {
   collection,
   getDocs,
-  // onSnapshot,
-  // doc,
+  onSnapshot,
+  doc,
 } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile,signOut } from "firebase/auth";
 import Box from '@mui/material/Box';
@@ -14,6 +14,8 @@ import { Input } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import Post from './components/Post'
 import BasicModal from './components/BasicModal'
+
+
 
 const style = {
   position: 'absolute',
@@ -60,19 +62,18 @@ function App() {
   const auth = getAuth();
 
   const postCollectionRef = collection(db, "posts");
+
   useEffect(() => {
-    const getUsers = async () => {
-      const data = await getDocs(postCollectionRef);
-      console.log(data)
-      setPosts(data.docs.map((doc) => ({
+    onSnapshot(postCollectionRef,(snapshot) =>{
+      setPosts(snapshot.docs.map((doc) => ({
         id: doc.id,
         post: doc.data()
       })));
-    };
-
-    getUsers();
+    })
   }, []);
-// console.log(posts)
+  console.log(posts)
+
+
 
 const signUp = (event) => {
   event.preventDefault();
@@ -167,7 +168,7 @@ setUser(null)
       <h1>This is a praactice project
       </h1>
       {posts.map(({id,post}) => (
-        <Post username={post.username} caption={post.caption} imageurl={post.imageurl} />
+        <Post key = {id} username={post.username} caption={post.caption} imageurl={post.imageurl} />
       ))}
   
 
