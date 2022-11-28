@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { createFilterOptions, Input } from '@mui/material';
+import {  Input } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { db, storage } from "../firebase"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc,serverTimestamp } from "firebase/firestore";
+// import { FirebaseError } from 'firebase/app';
 
 const style = {
     position: 'absolute',
@@ -27,7 +28,7 @@ export default function ImageUpload({ userName }) {
     const [image, setImage] = useState(null);
     const [progress, setProgress] = useState(0);
     const [caption, setCaption] = useState("");
-    const [url, setUrl] = useState('');
+    // const [url, setUrl] = useState('');
 
     const handleChange = (e) => {
         if (e.target.files[0]) {
@@ -56,23 +57,24 @@ export default function ImageUpload({ userName }) {
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-                    // const docRef = await addDoc(collection(db, "posts"), {
-                    //     username: userName,
-                    //     caption: caption,
-                    //     imageurl: downloadURL
-                    // });
-                    // console.log("Document written with ID: ", docRef.id);
-                    setUrl(downloadURL)
+                    const docRef = await addDoc(collection(db, "posts"), {
+                        timestamp:serverTimestamp(),
+                        username: userName,
+                        caption: caption,
+                        imageurl: downloadURL
+                    });
+                    console.log("Document written with ID: ", docRef.id);
+                    // setUrl(downloadURL)
                     console.log('File available at', downloadURL);
                 });
                 setImage(null)
                 setCaption("")
                 setProgress(0)
-
                 handleClose()
 
             }
         )
+        console.log('hello')
 
     }
 
@@ -95,7 +97,7 @@ export default function ImageUpload({ userName }) {
                         <img className="app_headerImage" src="https://cdn.pixabay.com/photo/2016/08/15/01/29/instagram-1594387__480.png" alt='instagram poster' />
                     </div>
                     <div>
-                        {/* <progress value = {}/> */}
+                        <progress value = {progress} max = "100"/>
                     </div>
                     <Input type="text" placeholder="caption..." onChange={e => setCaption(e.target.value)} />
                     <Input type="file" onChange={handleChange} />

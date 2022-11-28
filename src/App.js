@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react'
 import { db, auth } from './firebase'
 import {
   collection,
-  getDocs,
+  getDocs,query,
   onSnapshot,
   doc,
+  orderBy,
 } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
 import Box from '@mui/material/Box';
@@ -65,9 +66,9 @@ function App() {
   const auth = getAuth();
 
   const postCollectionRef = collection(db, "posts");
-
+   const dataquery = query(postCollectionRef,orderBy('timestamp')) 
   useEffect(() => {
-    onSnapshot(postCollectionRef, (snapshot) => {
+    onSnapshot(dataquery, (snapshot) => {
       setPosts(snapshot.docs.map((doc) => ({
         id: doc.id,
         post: doc.data()
@@ -83,7 +84,7 @@ function App() {
     createUserWithEmailAndPassword(auth, email, password)
       .then((authUser) => {
         console.log(authUser)
-        setUser({ ...user, authUser })
+        setUser(authUser )
 
         setOpen(false)
         updateProfile(auth.currentUser, {
@@ -112,8 +113,8 @@ function App() {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const userDetail = userCredential.user;
-        setUser({ ...user, userDetail })
-        console.log(userDetail)
+        // setUser(userDetail )
+        console.log(userDetail.displayName)
         setOpenSignin(false)
       })
       .catch((error) => {
@@ -126,7 +127,8 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
-
+        setUser(authUser )
+        setUserName(authUser.displayName)
         console.log(authUser)
       } else {
         setUser(null)
@@ -136,12 +138,16 @@ function App() {
       unsubscribe()
     }
   }, [user, userName]);
-
-
+console.log(userName)
 
   return (
     <div className="App">
+      {user?.displayName?(
 <ImageUpload userName={userName}/>
+      ) : (
+        <h4>Login to  Upload</h4>
+      )
+      }
       {user ? (
         <Button onClick={signout}>LogOut</Button>
       ) : (

@@ -11,7 +11,7 @@ export default function Post({username ,caption,imageurl}) {
         </div>
         <img className = "post_image"src={imageurl} alt='post'/>
         <h4 className = "post_text"><strong>
-        AasimTaifullah </strong> :{caption}</h4>
+        {username} </strong> :{caption}</h4>
 
     </div>
   )
